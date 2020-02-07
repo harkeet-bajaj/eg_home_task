@@ -21,8 +21,8 @@ PROVISIONING THE ENVIRONEMENT
 Clone or download the pubic GitHub repository to obtain the vagrantfile and the necessary ansible roles to provision the environment.
 
 Dependencies for provisioning the environment:
-	Vagrant 
-	VirtualBox
+	* Vagrant 
+	* VirtualBox
 Note: Code is not dependent on local installation of ansible engine on the host machine as vagrant file is using the Ansible Local provisioner allowing us to provision the guest using Ansible playbooks by executing ansible-playbook directly on the guest machine.
 
 
@@ -31,4 +31,4 @@ Note: Code is not dependent on local installation of ansible engine on the host 
 2.	Change directory to the eg_home_task folder.
 
 3.	Provision the vagrant environment using the following vagrant command
-	vagrant up
+	>>> vagrant up
