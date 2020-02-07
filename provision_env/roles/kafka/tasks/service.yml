@@ -1,0 +1,17 @@
+- name: KAFKA | Configuring service
+  systemd:
+    name: kafka
+    state: started
+    enabled: true
+    daemon_reload: true
+
+- name: KAFKA | Restart if necessary
+  meta: flush_handlers
+
+- name: KAFKA | Wait for service listening
+  wait_for:
+    host: "{{ kafka_host_name }}"
+    port: "{{ kafka_port }}"
+    state: started
+    delay: 5
+    timeout: 300

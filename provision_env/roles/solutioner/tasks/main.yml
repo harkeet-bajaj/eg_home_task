@@ -1,0 +1,82 @@
+---
+
+# - name: upgrade all packages
+#   yum:
+#     name: '*'
+#     state: latest
+
+- name: Install IUS (CentOS) repo
+  yum: name=https://centos7.iuscommunity.org/ius-release.rpm
+  # name=https://dl.iuscommunity.org/pub/ius/stable/CentOS/7/x86_64/ius-release-1.0-15.ius.centos7.noarch.rpm
+
+- name: Install a list of packages
+  yum:
+    state: latest
+    name:
+      # - https://centos7.iuscommunity.org/ius-release.rpm
+      - python36u
+      - python36u-devel
+      - python36u-libs
+      - python36u-pip
+      - python36-setuptools
+      - python-pip
+      - conda
+      #- virtualenv
+      # - setuptools
+  
+  
+- name: Installing Python PIP dependencies
+  pip:
+    executable: pip3.6
+    name:
+      # - virtualenv
+      - kafka-python
+      - kafka
+      - prometheus_client
+      # - time
+      # - jsonlib
+
+
+- name: Create directory for python code
+  file:
+    path: /opt/kafka_code
+    state: directory
+    mode: 0775
+
+
+- name: Copy Producer and Consumer python code 
+  copy:
+    src: "{{ item }}"
+    dest: /opt/kafka_code
+    mode: 0755
+  loop:
+    - producer_service.py
+    - consumer_service.py
+
+
+- name: Template kafka producer systemd service file to /etc/systemd/system/producer.service
+  template:
+    src: producer.service.j2
+    dest: /etc/systemd/system/producer.service
+    mode: 0644
+
+
+- name: Template kafka consumer systemd service file to /etc/systemd/system/consumer.service
+  template:
+    src: consumer.service.j2
+    dest: /etc/systemd/system/consumer.service
+    mode: 0644
+
+- name: Configuring Kafka Producer service
+  systemd:
+    name: producer
+    state: started
+    enabled: true
+    daemon_reload: true
+
+- name: Configuring Kafka Consumer service
+  systemd:
+    name: consumer
+    state: started
+    enabled: true
+    daemon_reload: true

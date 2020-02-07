@@ -1,0 +1,54 @@
+---
+## Kafka Env
+kafka_version: 2.4.0
+kafka_scala_version: 2.13
+#kafka_host_name: "{{ ansible_nodename }}"
+kafka_host_name: 192.168.30.101
+kafka_port: 9092
+
+
+#Zooker config
+kafka_zookeeper_hosts:
+  - 192.168.30.101:2181
+
+# Consumers details
+kafka_consumer_hosts:
+  - 192.168.30.102
+
+# Producers details
+kafka_producer_hosts:
+  - 192.168.30.102
+
+# Kafka Owner
+kafka_user: kafka
+kafka_group: kafka
+
+# start on boot
+kafka_service_enabled: true
+# current state: started, stopped
+kafka_service_state: started
+
+# JMX JVM Values
+kafka_xmx: "{{ (ansible_memtotal_mb / 2) | int }}m"
+kafka_xms: "{{ (ansible_memtotal_mb / 2) | int }}m"
+#kafka_jmx_port: 9101
+kafka_opts: "-javaagent:/opt/kafka/jmx_exporter/jmx_prometheus_javaagent-0.12.0.jar=7071:/opt/kafka/jmx_exporter/config/jmx_kafka_config.yml"
+kafka_jvm_performance_opts: ""
+
+# Kafka Installation Files & Paths
+kafka_install_path: /opt/kafka
+kafka_conf_path: /opt/kafka/config
+kafka_data_path: /opt/kafka/data
+kafka_log_path: /opt/kafka/logs
+
+# JMX Exporter Installation Files & Paths
+jmx_path: /opt/kafka/jmx_exporter
+jmx_conf_path: /opt/kafka/jmx_exporter/config
+
+kafka_topics:
+  - name: 'input'
+    partitions: '1'
+    replicas: '1'
+  - name: 'output'
+    partitions: '1'
+    replicas: '1'

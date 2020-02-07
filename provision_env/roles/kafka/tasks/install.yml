@@ -1,0 +1,91 @@
+---
+
+- name: KAFKA | Installing dependencies
+  yum:
+    pkg: java-1.8.0-openjdk-devel
+    state: present
+
+- name: KAFKA | Create kafka group
+  group:
+    name: "{{ kafka_group }}"
+
+- name: KAFKA | Create kafka user
+  user:
+    name: "{{ kafka_user }}"
+    group: "{{ kafka_group }}"
+    home: /bin/false
+
+- name: KAFKA | Create kafka setup directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ kafka_user }}"
+    group: "{{ kafka_group }}"
+    mode: 0775
+    recurse: true
+  loop:
+    - "{{ kafka_install_path }}"
+    - "{{ kafka_conf_path }}"
+    - "{{ kafka_data_path }}"
+    - "{{ kafka_log_path }}"
+    - "{{ jmx_path }}"
+    - "{{ jmx_conf_path }}"
+
+- name: JMX Exporter Setup
+  include: jmx_exporter.yml
+
+- name: KAFKA | Download Package and Untar 
+  unarchive:
+    extra_opts: ['--strip-components=1']
+    src: "{{ kafka_sources_url }}"
+    remote_src: true
+    dest: "{{ kafka_install_path }}"
+    owner: "{{ kafka_user }}"
+    group: "{{ kafka_group }}"
+
+- name: Template Zookeeper systemd service file to /etc/systemd/system/zookeeper.service
+  template:
+    src: zookeeper.service.j2
+    dest: /etc/systemd/system/zookeeper.service
+    mode: 0644
+  notify:
+    - Reload daemon
+
+# - name: sleep for 10 seconds and continue with play
+#   wait_for:
+#     timeout: 10
+#   delegate_to: localhost
+
+- name: Template kafka systemd service file to /etc/systemd/system/kafka.service
+  template:
+    src: kafka.service.j2
+    dest: /etc/systemd/system/kafka.service
+    mode: 0644
+  notify: Restart kafka systemd
+
+- name: KAFKA | Template configuration file to server.properties
+  template:
+    src: server.properties.j2
+    dest: "{{ kafka_conf_path }}/server.properties"
+    mode: 0644
+    owner: "{{ kafka_user }}"
+    group: "{{ kafka_group }}"
+  notify: Restart kafka systemd
+
+- name: KAFKA | Configuring service
+  systemd:
+    name: kafka
+    state: started
+    enabled: true
+    daemon_reload: true
+
+- name: KAFKA | Restart if necessary
+  meta: flush_handlers
+
+- name: KAFKA | Wait for service listening
+  wait_for:
+    host: "{{ kafka_host_name }}"
+    port: "{{ kafka_port }}"
+    state: started
+    delay: 5
+    timeout: 60

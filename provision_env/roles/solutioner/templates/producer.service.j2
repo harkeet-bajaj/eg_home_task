@@ -1,0 +1,10 @@
+[Unit]
+Description=Kafka Producer Service
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python3.6 /opt/kafka_code/producer_service.py > /opt/kafka_code/producer.log 2>&1
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,23 @@
+---
+
+- hosts: kafka
+  become: yes
+  become_user: root
+  become_method: sudo
+  roles:
+    - role: kafka
+
+- hosts: solutioner
+  become: yes
+  become_user: root
+  become_method: sudo
+  roles:
+    - solutioner
+
+- hosts: prometheus
+  become: yes
+  become_user: root
+  become_method: sudo
+  roles:
+    - prometheus
+    - grafana

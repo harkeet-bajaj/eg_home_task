@@ -1,0 +1,17 @@
+---
+
+- name: JMX Exporter | Copy Jar
+  copy:
+    src: jmx_prometheus_javaagent-0.12.0.jar
+    dest: "{{ jmx_path }}"
+    owner: "{{ kafka_user }}"
+    group: "{{ kafka_group }}"
+    mode: 0755
+
+- name: JMX Exporter | Copy JMX config for scrapping
+  copy:
+    src: jmx_kafka_config.yml
+    dest: "{{ jmx_conf_path }}"
+    owner: "{{ kafka_user }}"
+    group: "{{ kafka_group }}"
+    mode: 0755

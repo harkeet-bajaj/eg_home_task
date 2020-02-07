@@ -1,0 +1,16 @@
+[Unit]
+Description=Prometheus
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User={{ prometheus_user }}
+Group={{ prometheus_group }}
+Restart=always
+RestartSec=2
+StartLimitInterval=0
+Type=simple
+ExecStart=/usr/local/bin/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/var/lib/prometheus --storage.tsdb.retention.time=2d
+
+[Install]
+WantedBy=multi-user.target
