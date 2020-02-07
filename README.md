@@ -31,4 +31,4 @@ Note: Code is not dependent on local installation of ansible engine on the host 
 2.	Change directory to the eg_home_task folder.
 
 3.	Provision the vagrant environment using the following vagrant command
-		vagrant up
+	vagrant up
